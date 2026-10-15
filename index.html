@@ -20,7 +20,8 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
   </style>
-</head>body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
 
   <!-- TOP ANNOUNCEMENT BAR -->
   <div class="bg-indigo-900 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium">
@@ -147,3 +148,321 @@
         <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
         <h3 class="text-lg font-bold text-slate-700">No products found</h3>
         <p class="text-sm text-slate-500 mt-1">Try clearing your filters or search terms.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 text-slate-400 text-xs sm:text-sm py-8 mt-12 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-3">
+      <p class="font-bold text-white text-base">Campus Fashion</p>
+      <p>Direct Orders & Delivery within <strong>Moi University Campus</strong></p>
+      <p class="text-slate-500">WhatsApp Contact: <a href="https://wa.me/254799924460" target="_blank" class="text-indigo-400 underline">0799924460</a></p>
+      <p class="pt-4 border-t border-slate-800 text-slate-600">&copy; Campus Fashion. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- CART MODAL / SIDEBAR -->
+  <div id="cartModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden transition-opacity">
+    <div class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl flex flex-col justify-between">
+      
+      <!-- HEADER -->
+      <div class="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-bag-shopping text-indigo-600 text-lg"></i>
+          <h3 class="font-black text-slate-900 text-lg">Your Order Cart</h3>
+        </div>
+        <button type="button" onclick="toggleCartModal()" class="text-slate-400 hover:text-slate-600 p-2 cursor-pointer">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+
+      <!-- CART ITEMS LIST -->
+      <div id="cartItemsContainer" class="p-4 flex-grow overflow-y-auto space-y-3 divide-y divide-slate-100">
+        <!-- Dynamic JS Cart Rendering -->
+      </div>
+
+      <!-- FOOTER / CHECKOUT -->
+      <div class="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+        <div class="flex justify-between items-center text-slate-700">
+          <span class="text-sm font-semibold">Delivery Location</span>
+          <span class="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-full font-bold">Moi University</span>
+        </div>
+        
+        <div class="flex justify-between items-center font-black text-slate-900 text-lg pt-2 border-t border-slate-200">
+          <span>Total Amount:</span>
+          <span id="cartTotalDisplay" class="text-indigo-600">KSh 0</span>
+        </div>
+
+        <button 
+          type="button"
+          onclick="checkoutWhatsApp()" 
+          class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-base active:scale-98 cursor-pointer"
+        >
+          <i class="fa-brands fa-whatsapp text-xl"></i>
+          <span>Order via WhatsApp</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADMIN AUTH & MANAGEMENT MODAL -->
+  <div id="adminModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden">
+      
+      <button type="button" onclick="closeAdminModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+
+      <!-- VIEW 1: LOGIN FORM -->
+      <div id="adminLoginView" class="space-y-4">
+        <div class="text-center">
+          <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl font-black">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h3 class="text-xl font-extrabold text-slate-900">Admin Login</h3>
+          <p class="text-xs text-slate-500 mt-1">Sign in to add or remove products</p>
+        </div>
+
+        <form onsubmit="handleAdminLogin(event)" class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Email</label>
+            <input type="email" id="adminEmail" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="admin@example.com" />
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Password</label>
+            <input type="password" id="adminPassword" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="••••••••" />
+          </div>
+          <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
+            Login
+          </button>
+        </form>
+      </div>
+
+      <!-- VIEW 2: PRODUCT ADD FORM -->
+      <div id="adminDashboardView" class="hidden space-y-4">
+        <div class="flex justify-between items-center border-b pb-3">
+          <h3 class="font-black text-slate-900 text-lg">Add New Product</h3>
+          <button type="button" onclick="handleAdminLogout()" class="text-xs text-red-600 font-bold hover:underline cursor-pointer">Sign Out</button>
+        </div>
+
+        <form onsubmit="handleAddProduct(event)" class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Product Name</label>
+            <input type="text" id="newProdName" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none" placeholder="e.g. Denim Jacket" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-xs font-bold text-slate-700 mb-1 block">Department</label>
+              <select id="newProdDept" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                <option value="women">Women</option>
+                <option value="men">Men</option>
+                <option value="kids">Kids</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-xs font-bold text-slate-700 mb-1 block">Category</label>
+              <select id="newProdCat" required class="w-full px-3 py-2 border rounded-xl text-sm outline-none">
+                <option value="clothing">Clothing</option>
+                <option value="shoes">Shoes</option>
+                <option value="toys">Toys</option>
+                <option value="bags">Bags</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Price (KSh)</label>
+            <input type="number" id="newProdPrice" required min="1" class="w-full px-3 py-2 border rounded-xl text-sm outline-none" placeholder="1200" />
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Image URL (Optional)</label>
+            <input type="url" id="newProdImage" class="w-full px-3 py-2 border rounded-xl text-sm outline-none" placeholder="https://example.com/photo.jpg" />
+          </div>
+
+          <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
+            + Save Product
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // 1. SUPABASE CLIENT INITIALIZATION
+    const SUPABASE_URL = 'https://hincofnxnhfmreemviiy.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_xmxOMZ0L9F6Z9nFNaFcu4g_cw_IWJeI';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // 2. STATE MANAGEMENT
+    let products = [];
+    let cart = [];
+    let currentDept = 'all';
+    let currentCat = 'all';
+    let searchQuery = '';
+    let currentUser = null;
+
+    const categoryIcons = {
+      clothing: 'fa-shirt text-indigo-500',
+      shoes: 'fa-shoe-prints text-amber-500',
+      toys: 'fa-gamepad text-emerald-500',
+      bags: 'fa-bag-shopping text-purple-500',
+      accessories: 'fa-glasses text-pink-500'
+    };
+
+    // 3. INITIALIZATION & DATA FETCHING
+    document.addEventListener('DOMContentLoaded', async () => {
+      await fetchProductsFromSupabase();
+      checkActiveUserSession();
+    });
+
+    async function fetchProductsFromSupabase() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('products')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (error) throw error;
+
+        products = data || [];
+        renderProducts();
+      } catch (err) {
+        console.error('Error loading products:', err.message);
+      }
+    }
+
+    async function checkActiveUserSession() {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data.session) {
+        currentUser = data.session.user;
+        showAdminDashboardView();
+      }
+    }
+
+    // 4. RENDERING CATALOG
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      const emptyState = document.getElementById('emptyState');
+      const countDisplay = document.getElementById('productCount');
+
+      const filtered = products.filter(p => {
+        const matchDept = currentDept === 'all' || p.department.toLowerCase() === currentDept;
+        const matchCat = currentCat === 'all' || p.category.toLowerCase() === currentCat;
+        const matchSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchDept && matchCat && matchSearch;
+      });
+
+      countDisplay.textContent = `${filtered.length} Items`;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(item => {
+        const iconClass = categoryIcons[item.category.toLowerCase()] || 'fa-tag text-indigo-500';
+        
+        return `
+          <div class="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            
+            <div>
+              <div class="w-full aspect-square bg-slate-100 rounded-xl mb-3 flex items-center justify-center overflow-hidden relative">
+                ${
+                  item.image_url 
+                  ? `<img src="${item.image_url}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='';" />`
+                  : `<i class="fa-solid ${iconClass} text-4xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform"></i>`
+                }
+                
+                <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
+                  ${item.department}
+                </span>
+
+                ${currentUser ? `
+                  <button onclick="deleteProduct(${item.id})" class="absolute top-2 right-2 bg-red-600 text-white p-1.5 rounded-lg shadow-md text-xs hover:bg-red-700 cursor-pointer">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                ` : ''}
+              </div>
+
+              <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider block mb-1">
+                ${item.category}
+              </span>
+              <h3 class="font-extrabold text-slate-800 text-sm sm:text-base leading-snug line-clamp-2">
+                ${item.name}
+              </h3>
+            </div>
+
+            <div class="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span class="font-black text-slate-900 text-sm sm:text-lg">
+                KSh ${Number(item.price).toLocaleString()}
+              </span>
+              
+              <button 
+                type="button"
+                onclick="addToCart(${item.id})" 
+                class="bg-indigo-600 hover:bg-indigo-700 text-white p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-1 shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                <i class="fa-solid fa-plus"></i>
+                <span class="hidden sm:inline">Add</span>
+              </button>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 5. FILTER & SEARCH HANDLERS
+    function setDepartment(dept) {
+      currentDept = dept;
+      document.querySelectorAll('.dept-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      const activeBtn = document.getElementById(`dept-${dept}`);
+      if(activeBtn) {
+        activeBtn.classList.remove('bg-white', 'text-slate-600');
+        activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+      }
+      renderProducts();
+    }
+
+    function setCategory(cat) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-200', 'font-bold', 'text-slate-800');
+        btn.classList.add('bg-white', 'text-slate-600');
+      });
+      const activeBtn = document.getElementById(`cat-${cat}`);
+      if(activeBtn) {
+        activeBtn.classList.remove('bg-white', 'text-slate-600');
+        activeBtn.classList.add('bg-slate-200', 'font-bold', 'text-slate-800');
+      }
+      renderProducts();
+    }
+
+    function handleSearch() {
+      searchQuery = document.getElementById('searchInput').value;
+      renderProducts();
+    }
+
+    function handleMobileSearch() {
+      searchQuery = document.getElementById('mobileSearchInput').value;
+      renderProduscts();
+    }
+
+    // 6. CART MANAGEMENT
+    function addToCart(productId) {
+      const product = products.find(p => p
