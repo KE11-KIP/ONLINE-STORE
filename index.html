@@ -22,7 +22,7 @@
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
-sss
+
   <!-- TOP ANNOUNCEMENT BAR -->
   <div class="bg-indigo-900 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium">
     <i class="fa-solid fa-truck-fast text-indigo-300 mr-2"></i> Fast & Convenient Delivery within <strong>Moi University Campus</strong>!
@@ -62,8 +62,9 @@ sss
           <!-- ADMIN BUTTON -->
           <button 
             type="button"
+            id="adminTriggerBtn"
             onclick="openAdminModal()" 
-            class="px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer z-10"
+            class="relative z-50 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <i class="fa-solid fa-lock text-indigo-600"></i>
             <span>Admin</span>
@@ -143,11 +144,11 @@ sss
         <!-- Dynamic JavaScript Injection -->
       </div>
 
-      <!-- EMPTY STATE -->
-      <div id="emptyState" class="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-300 my-4">
-        <i class="fa-solid fa-box-open text-4xl text-slate-300 mb-3"></i>
-        <h3 class="text-lg font-bold text-slate-700">No products found</h3>
-        <p class="text-sm text-slate-500 mt-1">Log in as Admin to add items to your store.</p>
+      <!-- CUSTOMER-FRIENDLY EMPTY STATE -->
+      <div id="emptyState" class="text-center py-16 bg-white rounded-3xl border border-dashed border-slate-200 my-4 shadow-sm">
+        <i class="fa-solid fa-shirt text-4xl text-indigo-300 mb-3"></i>
+        <h3 class="text-lg font-bold text-slate-800">Catalog Updating</h3>
+        <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto">New fashion items are arriving soon. Please check back shortly!</p>
       </div>
     </section>
 
@@ -320,6 +321,12 @@ sss
 
     // 3. INITIALIZATION & DATA FETCHING
     document.addEventListener('DOMContentLoaded', async () => {
+      // Re-bind click event to ensure admin modal opens reliably
+      const adminBtn = document.getElementById('adminTriggerBtn');
+      if (adminBtn) {
+        adminBtn.addEventListener('click', openAdminModal);
+      }
+
       await fetchProductsFromSupabase();
       checkActiveUserSession();
     });
@@ -625,7 +632,7 @@ sss
 
       const file = fileInput.files[0];
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36.substring(2))}.${fileExt}`;
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `${fileName}`;
 
       try {
@@ -648,7 +655,7 @@ sss
 
         submitBtn.textContent = 'Saving Product...';
 
-        // 3. Insert product record into the database table
+        // 3. Insert product record into database table
         const { error: dbError } = await supabaseClient
           .from('products')
           .insert([{ name, department, category, price, image_url }]);
