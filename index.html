@@ -22,7 +22,7 @@
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
-
+sss
   <!-- TOP ANNOUNCEMENT BAR -->
   <div class="bg-indigo-900 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium">
     <i class="fa-solid fa-truck-fast text-indigo-300 mr-2"></i> Fast & Convenient Delivery within <strong>Moi University Campus</strong>!
@@ -229,11 +229,11 @@
         <form onsubmit="handleAdminLogin(event)" class="space-y-3">
           <div>
             <label class="text-xs font-bold text-slate-700 mb-1 block">Email</label>
-            <input type="email" id="adminEmail" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="admin@example.com" />
+            <input type="email" id="adminEmailInput" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="admin@example.com" />
           </div>
           <div>
             <label class="text-xs font-bold text-slate-700 mb-1 block">Password</label>
-            <input type="password" id="adminPassword" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="••••••••" />
+            <input type="password" id="adminPasswordInput" required class="w-full px-3 py-2 border rounded-xl text-sm focus:border-indigo-600 outline-none" placeholder="••••••••" />
           </div>
           <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
             Login
@@ -282,11 +282,11 @@
           </div>
 
           <div>
-            <label class="text-xs font-bold text-slate-700 mb-1 block">Image URL (Optional)</label>
-            <input type="url" id="newProdImage" class="w-full px-3 py-2 border rounded-xl text-sm outline-none" placeholder="https://example.com/photo.jpg" />
+            <label class="text-xs font-bold text-slate-700 mb-1 block">Product Image (Select from Device) *</label>
+            <input type="file" id="newProdImageFile" accept="image/*" required class="w-full px-3 py-1.5 border rounded-xl text-sm outline-none bg-slate-50 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer" />
           </div>
 
-          <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
+          <button type="submit" id="submitProductBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md cursor-pointer">
             + Save Product
           </button>
         </form>
@@ -302,7 +302,7 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_xmxOMZ0L9F6Z9nFNaFcu4g_cw_IWJeI';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 2. STATE MANAGEMENT (Starts empty)
+    // 2. STATE MANAGEMENT
     let products = [];
     let cart = [];
     let currentDept = 'all';
@@ -385,7 +385,7 @@
                   : `<i class="fa-solid ${iconClass} text-4xl sm:text-5xl opacity-80 group-hover:scale-110 transition-transform"></i>`
                 }
                 
-                <span class="absolute top-2 left-2 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
+                <span class="absolute top-2 left-2 bg-slate-900/85 backdrop-blur-md text-white text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
                   ${item.department}
                 </span>
 
@@ -519,9 +519,9 @@
           </div>
 
           <div class="flex items-center gap-2 bg-slate-100 rounded-lg p-1">
-            <button onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded text-slate-700 font-black text-xs shadow-sm cursor-pointer">-</button>
+            <button type="button" onclick="updateCartQuantity(${item.id}, -1)" class="w-6 h-6 bg-white rounded text-slate-700 font-black text-xs shadow-sm cursor-pointer">-</button>
             <span class="text-xs font-bold text-slate-800 px-1">${item.quantity}</span>
-            <button onclick="updateCartQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded text-slate-700 font-black text-xs shadow-sm cursor-pointer">+</button>
+            <button type="button" onclick="updateCartQuantity(${item.id}, 1)" class="w-6 h-6 bg-white rounded text-slate-700 font-black text-xs shadow-sm cursor-pointer">+</button>
           </div>
         </div>
       `).join('');
@@ -575,8 +575,8 @@
 
     async function handleAdminLogin(e) {
       e.preventDefault();
-      const email = document.getElementById('adminEmail').value;
-      const password = document.getElementById('adminPassword').value;
+      const email = document.getElementById('adminEmailInput').value;
+      const password = document.getElementById('adminPasswordInput').value;
 
       try {
         const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -615,14 +615,45 @@
       const department = document.getElementById('newProdDept').value;
       const category = document.getElementById('newProdCat').value;
       const price = parseFloat(document.getElementById('newProdPrice').value);
-      const image_url = document.getElementById('newProdImage').value || null;
+      const fileInput = document.getElementById('newProdImageFile');
+      const submitBtn = document.getElementById('submitProductBtn');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert('Please select an image file from your device.');
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36.substring(2))}.${fileExt}`;
+      const filePath = `${fileName}`;
 
       try {
-        const { error } = await supabaseClient
+        submitBtn.textContent = 'Uploading Image...';
+        submitBtn.disabled = true;
+
+        // 1. Upload file to Supabase Storage Bucket ('product-images')
+        const { error: uploadError } = await supabaseClient.storage
+          .from('product-images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // 2. Get Public URL for the uploaded image
+        const { data: publicURLData } = supabaseClient.storage
+          .from('product-images')
+          .getPublicUrl(filePath);
+
+        const image_url = publicURLData.publicUrl;
+
+        submitBtn.textContent = 'Saving Product...';
+
+        // 3. Insert product record into the database table
+        const { error: dbError } = await supabaseClient
           .from('products')
           .insert([{ name, department, category, price, image_url }]);
 
-        if (error) throw error;
+        if (dbError) throw dbError;
 
         alert('Product added successfully!');
         e.target.reset();
@@ -630,6 +661,9 @@
         closeAdminModal();
       } catch (err) {
         alert('Error adding product: ' + err.message);
+      } finally {
+        submitBtn.textContent = '+ Save Product';
+        submitBtn.disabled = false;
       }
     }
 
